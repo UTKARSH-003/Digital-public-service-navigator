@@ -1,0 +1,71 @@
+@import '@fontsource-variable/inter/index.css';
+@import '@fontsource/instrument-serif/latin-400-italic.css';
+@import '@fontsource/noto-sans-devanagari/devanagari-500.css';
+@import '@fontsource/noto-sans-devanagari/devanagari-700.css';
+@import './styles/tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { font-size: 100%; scroll-padding-top: calc(var(--nav-height) + 1rem); }
+  body { @apply bg-paper text-ink font-sans font-medium antialiased; font-size: 1.0625rem; line-height: 1.55; text-rendering: optimizeLegibility; }
+  h1, h2, h3, h4 { @apply font-display font-bold; word-spacing: 0.1em; }
+  a { text-underline-offset: 0.2em; }
+  ::selection { background: var(--color-foreground); color: var(--color-background); }
+  :focus-visible { outline: 3px solid var(--color-foreground); outline-offset: 3px; }
+  /* focus on dark surfaces */
+  .on-dark :focus-visible { outline-color: var(--color-footer-text); }
+  /* Devanagari needs normal tracking and taller line height: tight display metrics clip matras */
+  :lang(hi) .t-display, :lang(hi) .t-hero, :lang(hi) h1, :lang(hi) h2, :lang(hi) h3 { letter-spacing: 0 !important; word-spacing: 0 !important; line-height: 1.2 !important; }
+}
+
+@layer components {
+  /* typography tokens */
+  .t-hero { font-family: var(--font-display); font-weight: 700; font-size: clamp(2.25rem, 11vw, 9rem); letter-spacing: var(--tracking-display); line-height: var(--leading-display); text-transform: uppercase; word-spacing: 0.1em; }
+  .t-display { font-family: var(--font-display); font-weight: 700; letter-spacing: var(--tracking-display); line-height: var(--leading-display); word-spacing: 0.1em; }
+  .t-label { font-family: var(--font-body); font-weight: 700; font-size: 0.8125rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  .t-serif { font-family: var(--font-serif); font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
+
+  .input { @apply w-full border border-line-strong bg-surface px-4 py-3 min-h-[48px] text-base font-medium text-ink; }
+  .page { @apply mx-auto w-full max-w-page; padding-inline: var(--gutter); }
+  .rule { border-color: var(--border-subtle); }
+
+  .skip-link { @apply absolute left-3 -top-24 z-[60] bg-ink text-paper px-4 py-3 t-label; }
+  .skip-link:focus { top: 0.75rem; }
+
+  /* editorial image/preview treatment */
+  .grayscale-hover { filter: grayscale(0.2); transition: filter var(--transition-reveal) var(--ease-editorial), transform var(--transition-reveal) var(--ease-editorial); }
+  .group:hover .grayscale-hover, .group:focus-within .grayscale-hover { filter: grayscale(0); transform: scale(1.05); }
+
+  /* clip-path reveal, triggered by adding .is-revealed (IntersectionObserver in Reveal) */
+  .reveal { clip-path: inset(0 0 100% 0); transition: clip-path var(--transition-reveal) var(--ease-editorial); }
+  .reveal.is-revealed { clip-path: inset(0 0 0 0); }
+
+  /* geometric icon tile */
+  .tile { @apply grid h-16 w-16 place-items-center border border-line-strong; transition: transform var(--transition-reveal) var(--ease-editorial), background-color var(--transition-fast), color var(--transition-fast); }
+  .group:hover .tile, .group:focus-within .tile { transform: rotate(12deg); background: var(--color-foreground); color: var(--color-background); }
+}
+
+@media (hover: none) {
+  .grayscale-hover { filter: grayscale(0); }
+  .group:hover .grayscale-hover { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  .reveal { clip-path: none; }
+  .group:hover .grayscale-hover, .group:hover .tile, .group:focus-within .tile { transform: none; }
+}
+
+@media print {
+  header, footer, nav, .no-print { display: none !important; }
+  body { background: white; font-size: 12pt; }
+}
+
+/* pill secondary text: hover / focus reveal, always visible without hover */
+.pill-detail { opacity: 0; transform: translateY(0.5rem); transition: opacity var(--transition-fast), transform var(--transition-reveal) var(--ease-editorial); }
+.group:hover .pill-detail, .group:focus-visible .pill-detail { opacity: 1; transform: none; }
+@media (hover: none) { .pill-detail { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .pill-detail { transform: none; } }
